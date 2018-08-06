@@ -1,9 +1,10 @@
 /**
- * This is just an experiment and can be ignored. My goal is to with makeing
- * logFactory more functional by currying it and using more function composition.
- * This requires abstracting the role of the logFactory as a higher order fucntion,
- * which may be more trouble than it's worth, but could pay off if we decide to
- * parameterize the source of the log, along with the destination.
+ * This is just an experiment and can be ignored. My goal is to make
+ * logFactory more functional by currying it and using more function
+ * composition. This requires abstracting the role of the logFactory as a
+ * higher order fucntion, which may be more trouble than it's worth, but
+ * could pay off if we decide to parameterize the source of the log, along
+ * with the destination parameter.
  */
 
 /*
