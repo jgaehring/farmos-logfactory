@@ -1,7 +1,8 @@
 # logFactory for farmOS
 
 This sandbox is for testing the logFactory used in the farmOS native 
-and client libraries. It's live at https://codesandbox.io/s/ov4y7ork9.
+and client libraries. It can be viewed here:
+https://codesandbox.io/s/github/jgaehring/farmos-logfactory
 
 You can run some tests in the console from `index.js`, or run the 
 example log statements already contained there.

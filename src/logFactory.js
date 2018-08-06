@@ -19,7 +19,8 @@ export const STORE = 'VUEX_STORE';
   Provide an optional `dest` parameter to ensure the proper formatting for its
   destination. TODO: It could be wise to add a source parameter as well.
 
-  A CodeSandbox for experimenting lives at https://codesandbox.io/s/ov4y7ork9
+  A CodeSandbox for experimenting with it can be found here:
+  https://codesandbox.io/s/github/jgaehring/farmos-logfactory
 */
 export default function(
   // Assign default properties or leave them as optional
