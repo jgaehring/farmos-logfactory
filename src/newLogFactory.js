@@ -32,7 +32,7 @@ export const SERVER = 'SERVER';
 export const STORE = 'VUEX';
 
 // Just one example here; could live in a separate file, perhaps with location const's
-const storeTemplate = [
+const vuexStoreTemplate = [
   {
     key: 'log_owner',
     default: '',
@@ -83,11 +83,18 @@ const storeTemplate = [
   },
 ];
 
+const webSqlTemplate = [
+  /* ... */
+];
+const farmosServerTemplate = [
+  /* ... */
+];
+
 function getTemplate(loc) {
   loc === undefined || loc === STORE
     ? vuexStoreTemplate
-    : loc === WEBSQL
-      ? webSQLTemplate
+    : loc === SQL
+      ? webSqlTemplate
       : loc === SERVER
         ? farmosServerTemplate
         : new Error(`The supplied location parameter is invalid.
@@ -104,9 +111,9 @@ const makeLogFactory = getTemplate => src => dest => dataObj => {
   const destTemp = getTemplate(dest);
   // This could also be abstracted out as some sort of `templateReducer()` function
   const log = destTemp.reduce((logObj, curDestProp) => {
-    defaults = srcTemp.forEach(curSrcProp => {
+    return srcTemp.forEach(curSrcProp => {
       if (
-        curSrcProp.key === destProp.key ||
+        curSrcProp.key === curDestProp.key ||
         /** filter for aliases too */ false
       ) {
         logObj[curDestProp.key] = curSrcProp.default;
@@ -121,7 +128,7 @@ const makeLogFactory = getTemplate => src => dest => dataObj => {
 };
 
 const logFactory = makeLogFactory(getTemplate);
-
+export default logFactory;
 // OLD IDEAS BELOW
 //
 //
