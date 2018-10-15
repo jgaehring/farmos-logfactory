@@ -13,6 +13,7 @@
 */
 // Note that we're importing all the parameters we need along with the logFactory itself
 import logFactory, { SQL, SERVER, STORE } from './logFactory';
+import log from './anotherLogFactory';
 
 // When no parameter is given, a default log will be created.
 const defaultLog = logFactory();
@@ -45,3 +46,38 @@ const serverLog = logFactory(
   SERVER,
 );
 console.log('Create log for posting to farmOS server: ', serverLog);
+
+/* 
+  This is a new implementation of the logFactory, currently contained in
+  the module `anotherLogFactory.js`. Below are some tests to demonstrate
+  how it works.
+*/
+
+const newLog = log.create();
+console.log('New log: ', newLog);
+
+const storeToStore = log.storeToStore({
+  log_owner: 'Fred',
+  notes: 'farmers are cool',
+  quantity: '',
+  id: '101',
+  local_id: '5',
+  name: 'Oct 10 Observation',
+  type: 'farm_observation',
+  timestamp: '1539129600',
+  images: [],
+  done: false,
+  isCachedLocally: true,
+  wasPushedToServer: true,
+  remoteUri: 'http://test.farmos.net/log/101',
+});
+console.log('storeToStore: ', storeToStore);
+
+const serializedSqlLog = log.storeToSql(storeToStore);
+console.log('storeToSql: ', serializedSqlLog);
+
+const storeToServer = log.storeToServer(storeToStore);
+console.log('storeToServer: ', storeToServer);
+
+const sqlToStore = log.sqlToStore(serializedSqlLog);
+console.log('sqlToStore: ', sqlToStore);
