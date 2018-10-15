@@ -22,7 +22,7 @@ export const STORE = 'VUEX_STORE';
   A CodeSandbox for experimenting with it can be found here:
   https://codesandbox.io/s/github/jgaehring/farmos-logfactory
 */
-export default function(
+export default function (
   // Assign default properties or leave them as optional
   {
     log_owner = '', // eslint-disable-line camelcase
@@ -33,10 +33,11 @@ export default function(
     name = '',
     type = '',
     timestamp = '',
-    photo_loc = '', // eslint-disable-line camelcase
+    images = [],
     done = false,
     isCachedLocally = false,
     wasPushedToServer = false,
+    remoteUri = '',
   } = {},
   dest,
 ) {
@@ -55,10 +56,13 @@ export default function(
       name,
       type,
       timestamp,
-      photo_loc,
-      done,
-      isCachedLocally,
-      wasPushedToServer,
+      // Use Array.concat() to make sure this is an array
+      images: parseImages(images),
+      // Use JSON.parse() to convert strings back to booleans
+      done: JSON.parse(done),
+      isCachedLocally: JSON.parse(isCachedLocally),
+      wasPushedToServer: JSON.parse(wasPushedToServer),
+      remoteUri,
     };
   }
   // The format for sending logs to the farmOS REST Server.
@@ -71,8 +75,8 @@ export default function(
       // quantity,
       name,
       type,
-      // timestamp,
-      // photo_loc,
+      timestamp,
+      field_farm_images: images,
     };
     /*
       Only return id property if one has already been assigned by the server,
@@ -92,18 +96,36 @@ export default function(
       name,
       type,
       timestamp,
-      photo_loc,
+      images,
       done,
       wasPushedToServer,
+      remoteUri,
     };
     /*
       Only return local_id property if one has already been assigned by WebSQL,
       otherwise let WebSQL assign a new one.
     */
-    if (local_id) {
-      // eslint-disable-line camelcase
+    if (local_id) { // eslint-disable-line camelcase
       log.local_id = local_id; // eslint-disable-line camelcase
     }
   }
   return log;
+}
+
+/*
+  This utility function, along with the use of `JSON.parse()` above,
+  provide a quick hacky solution, but we need something better
+  for parsing data when it goes between Vuex and WebSQL. See:
+  https://github.com/farmOS/farmOS-native/issues/27#issuecomment-412093491
+  https://github.com/farmOS/farmOS-native/issues/40#issuecomment-419131892
+  https://github.com/farmOS/farmOS-native/issues/45
+*/
+function parseImages(x) {
+  if (typeof x === 'object') {
+    return x;
+  }
+  if (typeof x === 'string') {
+    return (x === '') ? [] : [].concat(x);
+  }
+  throw new Error(`${x} cannot be parsed as an image array`);
 }
