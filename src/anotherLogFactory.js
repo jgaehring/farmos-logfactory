@@ -135,10 +135,10 @@ function parseImages(x) {
 
 const log = {
   create: makeLogFactory(),
-  storeToStore: makeLogFactory(STORE, STORE),
-  storeToSql: makeLogFactory(STORE, SQL),
-  storeToServer: makeLogFactory(STORE, SERVER),
-  sqlToStore: makeLogFactory(SQL, STORE),
+  toStore: makeLogFactory(STORE, STORE),
+  toSql: makeLogFactory(STORE, SQL),
+  toServer: makeLogFactory(STORE, SERVER),
+  fromSql: makeLogFactory(SQL, STORE),
 };
 
 export default log;

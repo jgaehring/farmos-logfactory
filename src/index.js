@@ -13,7 +13,7 @@
 */
 // Note that we're importing all the parameters we need along with the logFactory itself
 import logFactory, { SQL, SERVER, STORE } from './logFactory';
-import log from './anotherLogFactory';
+console.log('MAIN LOG FACTORY TESTS: ');
 
 // When no parameter is given, a default log will be created.
 const defaultLog = logFactory();
@@ -48,16 +48,20 @@ const serverLog = logFactory(
 console.log('Create log for posting to farmOS server: ', serverLog);
 
 /* 
-  This is a new implementation of the logFactory, currently contained in
-  the module `anotherLogFactory.js`. Below are some tests to demonstrate
-  how it works.
+  ALTERNATIVE API
+  This is a alternate implementation of the logFactory, currently contained
+  in the module `anotherLogFactory.js`. Below are some tests to demonstrate
+  how it's modified API works.
 */
+import log from './anotherLogFactory'; // eslint-disable-line
+console.log('ALTERNATE LOGFACTORY TESTS:');
 
+// Generate a new log with only the default properties.
 const newLog = log.create();
-console.log('New log: ', newLog);
+console.log('Create a new log: ', newLog);
 
-const storeToStore = log.storeToStore({
-  log_owner: 'Fred',
+// Create a new log but set some of the properties manually.
+const sampleLog = log.create({
   notes: 'farmers are cool',
   quantity: '',
   id: '101',
@@ -71,13 +75,24 @@ const storeToStore = log.storeToStore({
   wasPushedToServer: true,
   remoteUri: 'http://test.farmos.net/log/101',
 });
-console.log('storeToStore: ', storeToStore);
+console.log('Create a log and set some properties manually: ', sampleLog);
 
-const serializedSqlLog = log.storeToSql(storeToStore);
-console.log('storeToSql: ', serializedSqlLog);
+// Copy the previous log, but change some of the properties.
+const revisedLog = log.toStore({
+  ...sampleLog,
+  done: true,
+  isCachedLocally: false,
+});
+console.log('Change some properties in the store: ', revisedLog);
 
-const storeToServer = log.storeToServer(storeToStore);
-console.log('storeToServer: ', storeToServer);
+// Serialize a log and handle its local_id for SQL insertion
+const serializedSqlLog = log.toSql(sampleLog);
+console.log('Serialize the log for SQL: ', serializedSqlLog);
 
-const sqlToStore = log.sqlToStore(serializedSqlLog);
-console.log('sqlToStore: ', sqlToStore);
+// Take a log back out of SQL and deserialize it
+const logFromSql = log.fromSql(serializedSqlLog);
+console.log('Deserialize a log from SQL: ', logFromSql);
+
+// Format the log so its ready to send in a POST request
+const logReadyToPost = log.toServer(sampleLog);
+console.log('Format a log for the server: ', logReadyToPost);
