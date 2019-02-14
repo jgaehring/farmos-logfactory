@@ -78,7 +78,7 @@ const makeLogFactory = (src, dest) => {
         if (local_id) {
           log.local_id = local_id;
         }
-        return log;
+        return JSON.stringify(log);
       }
       // The format for sending logs to the farmOS REST Server.
       if (dest === SERVER) {
