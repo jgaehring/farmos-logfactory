@@ -34,10 +34,13 @@ export default function (
     type = '',
     timestamp = '',
     images = [],
-    done = false,
+    done = true,
     isCachedLocally = false,
     wasPushedToServer = false,
     remoteUri = '',
+    field_farm_asset = [], // eslint-disable-line camelcase
+    field_farm_area = [], // eslint-disable-line camelcase
+    field_farm_geofield = [], // eslint-disable-line camelcase
   } = {},
   dest,
 ) {
@@ -57,16 +60,22 @@ export default function (
       type,
       timestamp,
       // Use Array.concat() to make sure this is an array
-      images: parseImages(images),
+      images: parseImages(images), // eslint-disable-line no-use-before-define
       // Use JSON.parse() to convert strings back to booleans
       done: JSON.parse(done),
       isCachedLocally: JSON.parse(isCachedLocally),
       wasPushedToServer: JSON.parse(wasPushedToServer),
       remoteUri,
+      field_farm_asset: parseObjects(field_farm_asset), // eslint-disable-line no-use-before-define
+      field_farm_area: parseObjects(field_farm_area), // eslint-disable-line no-use-before-define
+      field_farm_geofield: parseObjects(field_farm_geofield), // eslint-disable-line no-use-before-define, max-len
     };
   }
   // The format for sending logs to the farmOS REST Server.
   if (dest === SERVER) {
+    // Just take the id from the assets/areas before sending
+    const assets = field_farm_asset.map(asset => ({ id: asset.id }));
+    const areas = field_farm_area.map(area => ({ id: area.tid }));
     log = {
       field_farm_notes: {
         format: 'farm_format',
@@ -74,9 +83,13 @@ export default function (
       },
       // quantity,
       name,
+      done,
       type,
       timestamp,
       field_farm_images: images,
+      field_farm_asset: assets,
+      field_farm_area: areas,
+      field_farm_geofield,
     };
     /*
       Only return id property if one has already been assigned by the server,
@@ -100,6 +113,9 @@ export default function (
       done,
       wasPushedToServer,
       remoteUri,
+      field_farm_asset: JSON.stringify(field_farm_asset),
+      field_farm_area: JSON.stringify(field_farm_area),
+      field_farm_geofield: JSON.stringify(field_farm_geofield),
     };
     /*
       Only return local_id property if one has already been assigned by WebSQL,
@@ -126,6 +142,17 @@ function parseImages(x) {
   }
   if (typeof x === 'string') {
     return (x === '') ? [] : [].concat(x);
+  }
+  throw new Error(`${x} cannot be parsed as an image array`);
+}
+
+// TODO: can this be used in place of parseImages?
+function parseObjects(x) {
+  if (typeof x === 'object') {
+    return x;
+  }
+  if (typeof x === 'string') {
+    return JSON.parse(x);
   }
   throw new Error(`${x} cannot be parsed as an image array`);
 }
