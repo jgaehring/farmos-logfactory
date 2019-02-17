@@ -2,16 +2,6 @@ const SQL = 'WEBSQL';
 const SERVER = 'FARMOS_SERVER';
 const STORE = 'VUEX_STORE';
 
-function parseObjects(x) {
-  if (typeof x === 'object') {
-    return x;
-  }
-  if (typeof x === 'string') {
-    return JSON.parse(x);
-  }
-  throw new Error(`${x} cannot be parsed as an image array`);
-}
-
 const makeLogFactory = (src, dest) => {
   if (src === STORE || src === undefined) {
     return function({
@@ -42,15 +32,14 @@ const makeLogFactory = (src, dest) => {
           name,
           type,
           timestamp,
-          images: parseObjects(images),
-          // Use JSON.parse() to convert strings back to booleans
-          done: JSON.parse(done),
-          isCachedLocally: JSON.parse(isCachedLocally),
-          wasPushedToServer: JSON.parse(wasPushedToServer),
+          images,
+          done,
+          isCachedLocally,
+          wasPushedToServer,
           remoteUri,
-          field_farm_asset: parseObjects(field_farm_asset),
-          field_farm_area: parseObjects(field_farm_area),
-          field_farm_geofield: parseObjects(field_farm_geofield),
+          field_farm_asset,
+          field_farm_area,
+          field_farm_geofield,
         };
       }
       // The format for inserting logs in WebSQL for local persistence.
@@ -67,9 +56,9 @@ const makeLogFactory = (src, dest) => {
           done,
           wasPushedToServer,
           remoteUri,
-          field_farm_asset: JSON.stringify(field_farm_asset),
-          field_farm_area: JSON.stringify(field_farm_area),
-          field_farm_geofield: JSON.stringify(field_farm_geofield),
+          field_farm_asset,
+          field_farm_area,
+          field_farm_geofield,
         };
         /*
           Only return local_id property if one has already been assigned by WebSQL,
@@ -112,54 +101,15 @@ const makeLogFactory = (src, dest) => {
   }
   if (src === SQL) {
     return function(serializedJSON) {
-      const {
-        log_owner,
-        notes,
-        quantity,
-        id,
-        local_id,
-        name,
-        type,
-        timestamp,
-        images,
-        done,
-        wasPushedToServer,
-        remoteUri,
-        field_farm_asset,
-        field_farm_area,
-        field_farm_geofield,
-      } = JSON.parse(serializedJSON);
-      if (dest === STORE || dest === undefined) {
-        return {
-          log_owner,
-          notes,
-          quantity,
-          id,
-          local_id,
-          name,
-          type,
-          timestamp,
-          // Use parseImages() to make sure this is an array,
-          images: parseObjects(images),
-          // Use JSON.parse() to convert strings back to booleans
-          done: JSON.parse(done),
-          wasPushedToServer: JSON.parse(wasPushedToServer),
-          remoteUri,
-          field_farm_asset: parseObjects(field_farm_asset),
-          field_farm_area: parseObjects(field_farm_area),
-          field_farm_geofield: parseObjects(field_farm_geofield),
-        };
-      }
+      return JSON.parse(serializedJSON);
     };
   }
 };
 
-const log = {
+export default {
   create: makeLogFactory(),
   toStore: makeLogFactory(STORE, STORE),
   toSql: makeLogFactory(STORE, SQL),
   toServer: makeLogFactory(STORE, SERVER),
   fromSql: makeLogFactory(SQL, STORE),
 };
-
-export default log;
